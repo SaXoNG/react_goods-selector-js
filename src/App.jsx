@@ -19,6 +19,7 @@ export const App = () => {
   const notSelectedTitle = (
     <h1 className="title is-flex is-align-items-center">No goods selected</h1>
   );
+  const [selectedGood, setSelectedElement] = useState('Jam');
 
   const [titleElement, setTitle] = useState(
     <h1 className="title is-flex is-align-items-center">
@@ -26,6 +27,7 @@ export const App = () => {
       <button
         onClick={() => {
           setTitle(notSelectedTitle);
+          setSelectedElement('');
         }}
         data-cy="ClearButton"
         type="button"
@@ -34,15 +36,13 @@ export const App = () => {
     </h1>,
   );
 
-  const [selectedElement, setSelectedElement] = useState([]);
-
   const removeItem = () => {
-    setSelectedElement([]);
+    setSelectedElement('');
     setTitle(notSelectedTitle);
   };
 
   const addItem = item => {
-    if (!selectedElement.includes(item)) {
+    if (!selectedGood.includes(item)) {
       setSelectedElement([item]);
       setTitle(
         <h1 className="title is-flex is-align-items-center">
@@ -67,7 +67,7 @@ export const App = () => {
       <table className="table">
         <tbody>
           {goods.map(nameOfProduct => {
-            const isSelected = selectedElement.includes(nameOfProduct);
+            const isSelected = selectedGood.includes(nameOfProduct);
             let something = '';
 
             if (isSelected) {
@@ -101,7 +101,7 @@ export const App = () => {
                     }}
                     data-cy="AddButton"
                     type="button"
-                    className="button"
+                    className={`button ${isSelected ? ' is-info' : ''}`}
                   >
                     {isSelected ? '-' : '+'}
                   </button>
