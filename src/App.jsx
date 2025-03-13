@@ -1,6 +1,7 @@
 import 'bulma/css/bulma.css';
 import './App.scss';
 import { useState } from 'react';
+import classNames from 'classnames';
 
 export const goods = [
   'Dumplings',
@@ -15,96 +16,74 @@ export const goods = [
   'Garlic',
 ];
 
-export const App = () => {
-  const notSelectedTitle = (
-    <h1 className="title is-flex is-align-items-center">No goods selected</h1>
-  );
-  const [selectedGood, setSelectedElement] = useState('Jam');
+const AddButton = ({ handler }) => (
+  <button
+    onClick={handler}
+    data-cy="AddButton"
+    type="button"
+    className="button"
+  >
+    +
+  </button>
+);
 
-  const [titleElement, setTitle] = useState(
-    <h1 className="title is-flex is-align-items-center">
-      Jam is selected
-      <button
-        onClick={() => {
-          setTitle(notSelectedTitle);
-          setSelectedElement('');
-        }}
-        data-cy="ClearButton"
-        type="button"
-        className="delete ml-3"
-      />
-    </h1>,
-  );
+const RemoveButton = ({ handler }) => (
+  <button
+    onClick={handler}
+    data-cy="RemoveButton"
+    type="button"
+    className="button is-info"
+  >
+    -
+  </button>
+);
+
+export const App = () => {
+  const [selectedGood, setSelectedGood] = useState('Jam');
 
   const removeItem = () => {
-    setSelectedElement('');
-    setTitle(notSelectedTitle);
+    setSelectedGood('');
   };
 
-  const addItem = item => {
-    if (!selectedGood.includes(item)) {
-      setSelectedElement([item]);
-      setTitle(
+  return (
+    <main className="section container">
+      {selectedGood ? (
         <h1 className="title is-flex is-align-items-center">
-          {`${item} is selected`}
+          {`${selectedGood} is selected`}
           <button
             onClick={() => {
-              removeItem();
+              setSelectedGood('');
             }}
             data-cy="ClearButton"
             type="button"
             className="delete ml-3"
           />
-        </h1>,
-      );
-    }
-  };
-
-  return (
-    <main className="section container">
-      {titleElement}
+        </h1>
+      ) : (
+        <h1 className="title is-flex is-align-items-center">
+          No goods selected
+        </h1>
+      )}
 
       <table className="table">
         <tbody>
           {goods.map(nameOfProduct => {
             const isSelected = selectedGood.includes(nameOfProduct);
-            let something = '';
-
-            if (isSelected) {
-              something = 'has-background-success-light';
-            }
 
             return (
-              <tr data-cy="Good" className={something} key={nameOfProduct}>
+              <tr
+                data-cy="Good"
+                className={classNames({
+                  'has-background-success-light': isSelected,
+                })}
+                key={nameOfProduct}
+              >
                 <td>
-                  <button
-                    onClick={() => {
-                      if (isSelected) {
-                        removeItem();
-                      } else {
-                        addItem(nameOfProduct);
-                        setTitle(
-                          <h1 className="title is-flex is-align-items-center">
-                            {`${nameOfProduct} is selected`}
-                            <button
-                              onClick={() => {
-                                removeItem();
-                                setTitle(notSelectedTitle);
-                              }}
-                              data-cy="ClearButton"
-                              type="button"
-                              className="delete ml-3"
-                            />
-                          </h1>,
-                        );
-                      }
-                    }}
-                    data-cy="AddButton"
-                    type="button"
-                    className={`button ${isSelected ? ' is-info' : ''}`}
-                  >
-                    {isSelected ? '-' : '+'}
-                  </button>
+                  {isSelected ? (
+                    <RemoveButton handler={removeItem} />
+                  ) : (
+                    <AddButton handler={() => setSelectedGood(nameOfProduct)} />
+                  )}
                 </td>
 
                 <td data-cy="GoodTitle" className="is-vcentered">
