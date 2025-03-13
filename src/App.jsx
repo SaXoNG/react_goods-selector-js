@@ -1,5 +1,6 @@
 import 'bulma/css/bulma.css';
 import './App.scss';
+import { useState } from 'react';
 
 export const goods = [
   'Dumplings',
@@ -14,57 +15,106 @@ export const goods = [
   'Garlic',
 ];
 
-export const App = () => (
-  <main className="section container">
+export const App = () => {
+  const notSelectedTitle = (
     <h1 className="title is-flex is-align-items-center">No goods selected</h1>
+  );
 
+  const [titleElement, setTitle] = useState(
     <h1 className="title is-flex is-align-items-center">
       Jam is selected
-      <button data-cy="ClearButton" type="button" className="delete ml-3" />
-    </h1>
+      <button
+        onClick={() => {
+          setTitle(notSelectedTitle);
+        }}
+        data-cy="ClearButton"
+        type="button"
+        className="delete ml-3"
+      />
+    </h1>,
+  );
 
-    <table className="table">
-      <tbody>
-        <tr data-cy="Good">
-          <td>
-            <button data-cy="AddButton" type="button" className="button">
-              +
-            </button>
-          </td>
+  const [selectedElement, setSelectedElement] = useState([]);
 
-          <td data-cy="GoodTitle" className="is-vcentered">
-            Dumplings
-          </td>
-        </tr>
+  const removeItem = () => {
+    setSelectedElement([]);
+    setTitle(notSelectedTitle);
+  };
 
-        <tr data-cy="Good" className="has-background-success-light">
-          <td>
-            <button
-              data-cy="RemoveButton"
-              type="button"
-              className="button is-info"
-            >
-              -
-            </button>
-          </td>
+  const addItem = item => {
+    if (!selectedElement.includes(item)) {
+      setSelectedElement([item]);
+      setTitle(
+        <h1 className="title is-flex is-align-items-center">
+          {`${item} is selected`}
+          <button
+            onClick={() => {
+              removeItem();
+            }}
+            data-cy="ClearButton"
+            type="button"
+            className="delete ml-3"
+          />
+        </h1>,
+      );
+    }
+  };
 
-          <td data-cy="GoodTitle" className="is-vcentered">
-            Jam
-          </td>
-        </tr>
+  return (
+    <main className="section container">
+      {titleElement}
 
-        <tr data-cy="Good">
-          <td>
-            <button data-cy="AddButton" type="button" className="button">
-              +
-            </button>
-          </td>
+      <table className="table">
+        <tbody>
+          {goods.map(nameOfProduct => {
+            const isSelected = selectedElement.includes(nameOfProduct);
+            let something = '';
 
-          <td data-cy="GoodTitle" className="is-vcentered">
-            Garlic
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </main>
-);
+            if (isSelected) {
+              something = 'has-background-success-light';
+            }
+
+            return (
+              <tr data-cy="Good" className={something} key={nameOfProduct}>
+                <td>
+                  <button
+                    onClick={() => {
+                      if (isSelected) {
+                        removeItem();
+                      } else {
+                        addItem(nameOfProduct);
+                        setTitle(
+                          <h1 className="title is-flex is-align-items-center">
+                            {`${nameOfProduct} is selected`}
+                            <button
+                              onClick={() => {
+                                removeItem();
+                                setTitle(notSelectedTitle);
+                              }}
+                              data-cy="ClearButton"
+                              type="button"
+                              className="delete ml-3"
+                            />
+                          </h1>,
+                        );
+                      }
+                    }}
+                    data-cy="AddButton"
+                    type="button"
+                    className="button"
+                  >
+                    {isSelected ? '-' : '+'}
+                  </button>
+                </td>
+
+                <td data-cy="GoodTitle" className="is-vcentered">
+                  {nameOfProduct}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </main>
+  );
+};
